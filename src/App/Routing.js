@@ -164,7 +164,7 @@ const Routing = (props) => {
                 userToken = data.token
                 await AsyncStorage.setItem('userToken', userToken)
             } catch (e) {
-                console.warn(e)
+                console.warn(e.error)
                 if (e.error !== null) {
                     userToken = null
                 }
@@ -181,7 +181,24 @@ const Routing = (props) => {
             dispatch({ type: 'LOGOUT' })
         },
 
-        signUp: () => { }
+        signUp: async (data) => {
+            let signUpToken;
+            const settings = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+            try {
+                const fetchSignUpResponse = await fetch (`https://reqres.in/users`, settings);
+                const data = await fetchSignUpResponse.json();
+                console.log(data);
+                signUpToken = data.token
+            } catch (e) {
+                console.warn(e)
+            }
+        }
     }), []);
 
     useEffect(() => {
@@ -190,7 +207,7 @@ const Routing = (props) => {
             try {
                 userToken = await AsyncStorage.getItem('userToken')
             } catch (e) {
-                console.warn(e);
+                console.warn(e.error);
             }
             dispatch({ type: 'RETRIEVE_TOKEN', token: userToken })
         }
