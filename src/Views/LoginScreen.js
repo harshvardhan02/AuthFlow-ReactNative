@@ -9,7 +9,11 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
+    Platform
 } from 'react-native';
+
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather'
 
 import { connect } from 'react-redux';
 import { loginUser } from '../Store/User/duck';
@@ -22,13 +26,35 @@ class LoginScreen extends Component {
         super(props);
         this.state = {
             email: '',
-            password: ''
+            password: '',
+            check_textInputChange: false,
+            secureTextEntry: true
         };
     }
 
-    onChangeHandler = (state, value) => {
+    textInputChange = (val) => {
+        if (val.length !== 0) {
+            this.setState({
+                email: val,
+                check_textInputChange: true
+            });
+        } else {
+            this.setState({
+                email: val,
+                check_textInputChange: false
+            });
+        }
+    }
+
+    handlePasswordChange = (val) => {
         this.setState({
-            [state]: value
+            password: val
+        })
+    }
+
+    updateSecureTextEntry = () => {
+        this.setState({
+            secureTextEntry: !this.state.secureTextEntry
         })
     }
 
@@ -41,63 +67,90 @@ class LoginScreen extends Component {
     render() {
         const { email, password } = this.state;
         return (
-            <ScrollView style={{ backgroundColor: '#f06543' }}>
-                <View style={styles.logo}>
-                    {/* <Image style={{ height: 25, width: 210, }} source={require('../../assets/logo.png')} /> */}
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.text_header}>Welcome</Text>
                 </View>
-                <View
-                    style={{
-                        marginHorizontal: 30,
-                        backgroundColor: '#7084E5',
-                        borderRadius: 8,
-                        marginTop: 30,
-                    }}>
-                    <TextInput
-                        onChangeText={(value) => this.onChangeHandler('email', value)}
-                        value={email}
-                        maxLength={40}
-                        placeholder="Email"
-                        autoCapitalize='none'
-                        placeholderTextColor="#ffffffaa"
-                        style={{
-                            paddingHorizontal: 15,
-                            color: '#fff',
-                            fontFamily: 'Muli-Medium',
-                        }}
-                    />
-                    <View
-                        style={{
-                            borderColor: '#5E79DB',
-                            borderWidth: 0.5,
-                            marginLeft: 10,
-                        }}></View>
-                    <TextInput
-                        onChangeText={(value) => this.onChangeHandler('password', value)}
-                        value={password}
-                        secureTextEntry={true}
-                        maxLength={40}
-                        placeholder="Password"
-                        placeholderTextColor="#ffffffaa"
-                        style={{
-                            paddingHorizontal: 15,
-                            color: '#fff',
-                            fontFamily: 'Muli-Medium',
-                        }}
-                    />
-                </View>
-                <TouchableOpacity
-                    onPress={() => this.loginHandler(email, password)}
-                    style={styles.loginButton}>
-                    <Text
-                        style={{
-                            color: '#6872E3',
-                            textAlign: 'center',
-                            fontFamily: 'Muli-Medium',
-                        }}>
-                        Sign In
+                <View style={styles.footer}>
+                    <Text style={styles.text_footer}>Email</Text>
+                    <View style={styles.action}>
+                        <FontAwesome
+                            name="user-o"
+                            color="#05375a"
+                            size={20}
+                        />
+                        <TextInput
+                            value={email}
+                            placeholder="Your Email"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => this.textInputChange(val)}
+                        />
+                        {this.state.check_textInputChange ?
+                            <Feather
+                                name="check-circle"
+                                color="green"
+                                size={20}
+                            />
+                            : null}
+                    </View>
+                    <Text style={[styles.text_footer, { marginTop: 35 }]}>Password</Text>
+                    <View style={styles.action}>
+                        <Feather
+                            name="lock"
+                            color="#05375a"
+                            size={20}
+                        />
+                        <TextInput
+                            value={password}
+                            placeholder="Your Password"
+                            secureTextEntry={this.state.secureTextEntry ? true : false}
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => this.handlePasswordChange(val)}
+                        />
+                        <TouchableOpacity onPress={() => this.updateSecureTextEntry()}>
+                            {this.state.secureTextEntry ?
+                                <Feather
+                                    name="eye-off"
+                                    color="grey"
+                                    size={20}
+                                />
+                                :
+                                <Feather
+                                    name="eye"
+                                    color="grey"
+                                    size={20}
+                                />
+                            }
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => this.loginHandler(email, password)}
+                        style={styles.loginButton}>
+                        <Text
+                            style={{
+                                color: '#fff',
+                                fontWeight: 'bold',
+                                fontSize: 20
+                            }}>
+                            Sign In
             			</Text>
-                </TouchableOpacity>
-            </ScrollView>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.signUpButton}>
+                        <Text
+                            style={{
+                                color: '#009387',
+                                fontWeight: 'bold',
+                                fontSize: 20
+                            }}>
+                            Sign Up
+            			</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         )
     }
 }
@@ -105,18 +158,85 @@ class LoginScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#009387'
     },
-    logo: {
+    header: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        paddingHorizontal: 20,
+        paddingBottom: 50
+    },
+    footer: {
+        flex: 3,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingHorizontal: 20,
+        paddingVertical: 30
+    },
+    text_header: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 30
+    },
+    text_footer: {
+        color: '#05375a',
+        fontSize: 18
+    },
+    action: {
+        flexDirection: 'row',
+        marginTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
+        paddingBottom: 5
+    },
+    textInput: {
+        flex: 1,
+        marginTop: Platform.OS === 'ios' ? 0 : -12,
+        paddingLeft: 10,
+        color: '#05375a'
+    },
+    button: {
+        alignItems: 'center',
+        marginTop: 50,
+        backgroundColor: '#009387'
+    },
+    signIn: {
+        width: '100%',
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 200,
+        borderRadius: 10,
     },
+    textSign: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+
+    // logo: {
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     marginTop: 200,
+    // },
     loginButton: {
-        marginHorizontal: 30,
+        width: '100%',
+        height: 50,
         marginTop: 20,
-        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#009387',
         borderRadius: 8,
-        paddingVertical: 10,
+    },
+
+    signUpButton: {
+        width: '100%',
+        height: 50,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#009387',
+        borderWidth: 1,
+        borderRadius: 8,
     },
 });
 
