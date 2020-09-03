@@ -18,9 +18,11 @@ import NotificationScreen from '../Views/NotificationScreen';
 import SearchScreen from '../Views/SearchScreen';
 import SettingsScreen from '../Views/SettingsScreen';
 import LoginScreen from '../Views/LoginScreen';
+import SignUpScreen from '../Views/SignUpScreen';
 
 const navOptionHandler = () => ({
     headerShown: false,
+    animationEnabled: false
 });
 
 const StackHome = createStackNavigator();
@@ -191,7 +193,7 @@ const Routing = (props) => {
                 body: JSON.stringify(data)
             }
             try {
-                const fetchSignUpResponse = await fetch (`https://reqres.in/users`, settings);
+                const fetchSignUpResponse = await fetch(`https://reqres.in/users`, settings);
                 const data = await fetchSignUpResponse.json();
                 console.log(data);
                 signUpToken = data.token
@@ -240,6 +242,11 @@ const Routing = (props) => {
                                 <StackRouting.Screen
                                     name="Login"
                                     component={LoginScreen}
+                                    options={navOptionHandler}
+                                />
+                                <StackRouting.Screen
+                                    name="SignUp"
+                                    component={SignUpScreen}
                                     options={navOptionHandler}
                                 />
                             </>
